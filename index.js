@@ -27,7 +27,7 @@ function generateZoompanExpression(iw, ih, zoomIntervals) {
     return zoomCommand;
 }
 
-function zoomVideo(iw, ih, z, ptX, ptY, zoomVals) {
+function zoomVideo(iw, ih, z, ptX, ptY, fps, zoomVals) {
 
     // let zoomCmd = '';
     // const zoominterVals = sortAndGroupZoomIntervals(zoomVals);
@@ -45,9 +45,9 @@ function zoomVideo(iw, ih, z, ptX, ptY, zoomVals) {
     const X = Math.floor((iw / 2) + ((ptX - (iw / 2)) * (z / (z - 1))));
     const Y = Math.floor((ih / 2) + ((ptY - (ih / 2)) * (z / (z - 1))));
     let zoomCmd = `zoompan=z='if(between(time,0,2),1+${(z - 1) / 2}*(time-0),if(between(time,4,6),${z}-${(z - 1) / 2}*(time-4),if(between(time,2,4),${z},1)))'`;
-    const ffmpegCommand = `ffmpeg -i input.mp4 -filter_complex "[0:v]split=4[lefttop][leftbottom][righttop][rightbottom];[lefttop]crop=${X}:${Y}:0:0,${zoomCmd}:x=${X}:y=${Y}:d=1:s=${X}x${Y}:fps=25[lt];[leftbottom]crop=${X}:${ih - Y}:0:${Y},${zoomCmd}:x=${X}:y=0:d=1:s=${X}x${ih - Y}:fps=25[lb];[righttop]crop=${iw - X}:${Y}:${X}:0,${zoomCmd}:x=0:y=${Y}:d=1:s=${iw - X}x${Y}:fps=25[rt];[rightbottom]crop=${iw - X}:${ih - Y}:${X}:${Y},${zoomCmd}:x=0:y=0:d=1:s=${iw - X}x${ih - Y}:fps=25[rb];color=c=ffffff:s=${iw}x${ih}:r=25:d=10,settb=1/10[bg];[bg][lt]overlay=0:0:enable='between(t,0,10)'[bglt];[bglt][lb]overlay=0:${Y}:enable='between(t,0,10)'[bglb];[bglb][rt]overlay=${X}:0:enable='between(t,0,10)'[bgrt];[bgrt][rb]overlay=${X}:${Y}:enable='between(t,0,10)'" -c:v libx264 -preset ultrafast ${outputFile}`;
+    const ffmpegCommand = `ffmpeg -i input.mp4 -filter_complex "[0:v]split=4[lefttop][leftbottom][righttop][rightbottom];[lefttop]crop=${X}:${Y}:0:0,${zoomCmd}:x=${X}:y=${Y}:d=1:s=${X}x${Y}:fps=${fps}[lt];[leftbottom]crop=${X}:${ih - Y}:0:${Y},${zoomCmd}:x=${X}:y=0:d=1:s=${X}x${ih - Y}:fps=${fps}[lb];[righttop]crop=${iw - X}:${Y}:${X}:0,${zoomCmd}:x=0:y=${Y}:d=1:s=${iw - X}x${Y}:fps=${fps}[rt];[rightbottom]crop=${iw - X}:${ih - Y}:${X}:${Y},${zoomCmd}:x=0:y=0:d=1:s=${iw - X}x${ih - Y}:fps=${fps}[rb];[lt][lb]vstack[left];[rt][rb]vstack[right];[left][right]hstack" -c:v libx264 -preset ultrafast ${outputFile}`;
     // execSync(ffmpegCommand, { stdio: "inherit" });
-    const scaledCommand = `ffmpeg -i input.mp4 -filter_complex "[0:v]split=4[lefttop][leftbottom][righttop][rightbottom];[lefttop]crop=${X}:${Y}:0:0,scale=${X * jitter}x${Y * jitter},${zoomCmd}:x=${X * jitter}:y=${Y * jitter}:d=1:s=${X}x${Y}:fps=25[lt];[leftbottom]crop=${X}:${ih - Y}:0:${Y},scale=${X * jitter}x${(ih - Y) * jitter},${zoomCmd}:x=${X * jitter}:y=0:d=1:s=${X}x${ih - Y}:fps=25[lb];[righttop]crop=${iw - X}:${Y}:${X}:0,scale=${(iw - X) * jitter}x${Y * jitter},${zoomCmd}:x=0:y=${Y * jitter}:d=1:s=${iw - X}x${Y}:fps=25[rt];[rightbottom]crop=${iw - X}:${ih - Y}:${X}:${Y},scale=${(iw - X) * jitter}x${(ih - Y) * jitter},${zoomCmd}:x=0:y=0:d=1:s=${iw - X}x${ih - Y}:fps=25[rb];color=c=ffffff:s=${iw}x${ih}:r=25:d=10,settb=1/10[bg];[bg][lt]overlay=0:0:enable='between(t,0,10)'[bglt];[bglt][lb]overlay=0:${Y}:enable='between(t,0,10)'[bglb];[bglb][rt]overlay=${X}:0:enable='between(t,0,10)'[bgrt];[bgrt][rb]overlay=${X}:${Y}:enable='between(t,0,10)'" -c:v libx264 -preset ultrafast ${output2File}`;
+    const scaledCommand = `ffmpeg -i input.mp4 -filter_complex "[0:v]split=4[lefttop][leftbottom][righttop][rightbottom];[lefttop]crop=${X}:${Y}:0:0,scale=${X * jitter}x${Y * jitter},${zoomCmd}:x=${X * jitter}:y=${Y * jitter}:d=1:s=${X}x${Y}:fps=${fps}[lt];[leftbottom]crop=${X}:${ih - Y}:0:${Y},scale=${X * jitter}x${(ih - Y) * jitter},${zoomCmd}:x=${X * jitter}:y=0:d=1:s=${X}x${ih - Y}:fps=${fps}[lb];[righttop]crop=${iw - X}:${Y}:${X}:0,scale=${(iw - X) * jitter}x${Y * jitter},${zoomCmd}:x=0:y=${Y * jitter}:d=1:s=${iw - X}x${Y}:fps=${fps}[rt];[rightbottom]crop=${iw - X}:${ih - Y}:${X}:${Y},scale=${(iw - X) * jitter}x${(ih - Y) * jitter},${zoomCmd}:x=0:y=0:d=1:s=${iw - X}x${ih - Y}:fps=${fps}[rb];[lt][lb]vstack[left];[rt][rb]vstack[right];[left][right]hstack" -c:v libx264 -preset ultrafast ${output2File}`;
     // execSync(scaledCommand, { stdio: "inherit" });
     console.log("Running command without Jitter Fix : \n", ffmpegCommand);
     console.log("\n\n\n\n\nRunning Command with Jitter Fix : \n", scaledCommand);
@@ -59,8 +59,9 @@ const inputWidth = 1920;
 const inputHeight = 1080;
 const Scale = 4;
 const ptX = 1440;
-const ptY = 675;
-const jitter = 10;
+const ptY = 405;
+const jitter = 3;
+const fps = 25;
 
 const zoomVals2 = [
     { x: 1440, y: 675, startTime: 5, endTime: 6, startZoom: 1, endZoom: 1.5 },
@@ -71,4 +72,4 @@ const zoomVals2 = [
     { x: 1440, y: 675, startTime: 3, endTime: 4, startZoom: 2, endZoom: 1 },
 ];
 
-zoomVideo(inputWidth, inputHeight, Scale, ptX, ptY, zoomVals2);
+zoomVideo(inputWidth, inputHeight, Scale, ptX, ptY, fps, zoomVals2);
